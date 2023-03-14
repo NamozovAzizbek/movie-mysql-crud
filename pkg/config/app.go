@@ -21,7 +21,7 @@ func Connect() {
 
 	// db, err = sql.Open("mysql", cfg.FormatDSN())
 	var err error
-	db, err = sql.Open("mysql", "root:@tcp(localhost:3306)/bookstore?charset=utf8&parseTime=True&loc=Local")
+	db, err = sql.Open("mysql", "root:@tcp(localhost:3306)/movie?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
 	}
