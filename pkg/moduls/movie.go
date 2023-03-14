@@ -30,7 +30,7 @@ func GetAllMovie() []Movie {
 	defer res.Close()
 
 	if err != nil {
-		log.Fatal("getall dagi select query bajarishda xatolik")
+		log.Fatal(err)
 	}
 	var (
 		movies []Movie
@@ -41,7 +41,7 @@ func GetAllMovie() []Movie {
 		err := res.Scan(&m.ID, &m.Isbn, &m.Title, &d.id, &d.Firstname, &d.Lastname)
 
 		if err != nil {
-			log.Fatal("getall dan go o'zgaruvchisiga o'zlashtrishda xatolik")
+			log.Fatal(err)
 		}
 		m.Director = &d
 		movies = append(movies, m)
