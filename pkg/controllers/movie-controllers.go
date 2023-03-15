@@ -35,6 +35,11 @@ func GetMovieById(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateMovie(w http.ResponseWriter, r *http.Request){
-	var movie moduls.Movie
-	utils.ParseBody(r, movie)
+	var newMovie moduls.Movie
+	utils.ParseBody(r, NewMovie)
+	newMovie.Create()
+	res, _ := json.Marshal(newMovie)
+	w.Header().Set("Content-Type", "pkglication/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
