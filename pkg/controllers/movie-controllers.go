@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/NamozovAzizbek/movie-mysql-crud/pkg/moduls"
+	"github.com/NamozovAzizbek/movie-mysql-crud/pkg/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -33,6 +34,7 @@ func GetMovieById(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-func CreateBook(w http.ResponseWriter, r *http.Request){
-	
+func CreateMovie(w http.ResponseWriter, r *http.Request){
+	var movie moduls.Movie
+	utils.ParseBody(r, movie)
 }

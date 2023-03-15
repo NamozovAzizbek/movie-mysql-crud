@@ -67,6 +67,6 @@ func GetMovie(id int) *Movie {
 	return &m
 }
 
-func Create() {
-
+func (m *Movie)Create() {
+	
 }
