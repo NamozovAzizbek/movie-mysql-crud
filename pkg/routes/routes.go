@@ -7,8 +7,8 @@ import(
 
 var RegisterMovieRouters = func (router *mux.Router)  {
 	router.HandleFunc("/movies", controllers.GetMovies).Methods("GET")
-	router.HandleFunc("/movies", controllers.GetMovie).Methods("GET")
+	router.HandleFunc("/movies{id}", controllers.GetMovieById).Methods("GET")
 	router.HandleFunc("/movies", controllers.CreateMovie).Methods("POST")
-	router.HandleFunc("/movies", controllers.UpdatMovie).Methods("PUT")	
-	router.HandleFunc("/movies", controllers.DeleteMovies).Methods("DELETE")
+	router.HandleFunc("/movies{id}", controllers.UpdatMovie).Methods("PUT")	
+	router.HandleFunc("/movies{id}", controllers.DeleteMovies).Methods("DELETE")
 }
