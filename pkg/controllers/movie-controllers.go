@@ -14,8 +14,9 @@ import (
 var NewMovie moduls.Movie
 
 func GetMovies(w http.ResponseWriter, r *http.Request) {
-	newMovies := moduls.GetMovies()
-	res, _ := json.Marshal(newMovies)
+	movies := moduls.GetMovies()
+	fmt.Println(movies, "<------------nishon------------>")
+	res, _ := json.Marshal(movies)
 	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
