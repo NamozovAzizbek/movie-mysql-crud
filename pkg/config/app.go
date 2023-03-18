@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
+var DB *sql.DB
 
 func Connect() {
 
@@ -21,16 +21,17 @@ func Connect() {
 
 	// db, err = sql.Open("mysql", cfg.FormatDSN())
 	var err error
-	db, err = sql.Open("mysql", "root:@tcp(localhost:3306)/movie?charset=utf8&parseTime=True&loc=Local")
+	DB, err = sql.Open("mysql", "root:@tcp(localhost:3306)/movie?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
+	defer DB.Close()
+	// pingErr := db.Ping()
+	// if pingErr != nil {
+	// 	log.Fatal(pingErr)
+	// }
+	
 }
 func GetDB() *sql.DB{
-	return db
+	return DB
 }
