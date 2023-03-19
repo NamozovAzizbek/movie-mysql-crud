@@ -74,15 +74,15 @@ func GetMovie(id int) *Movie {
 }
 
 func (m *Movie) Create() *Movie {
-	m.ID = rand.Intn(100000000000000)
+	m.ID = rand.Intn(1000000)
 	res, err := db.Query("INSERT INTO `movie` (`created_at`, `id`, `isbn`, `title`) VALUES (NOW(), ?, ?, ?)", m.ID, m.Isbn, m.Title)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer res.Close()
-	d := m.Director
+	var d Director
 	d.movie_id = m.ID
-	d.id = rand.Intn(100000000000000)
+	d.id = rand.Intn(1000000)
 	res, err = db.Query("ISERT INTO `director`(`id`, `firstname`, `lastname`, `movie_id`) VALUES(?,?,?,?)", d.id, d.Firstname, d.Lastname, d.movie_id)
 	if err != nil {
 		log.Fatal(err)
