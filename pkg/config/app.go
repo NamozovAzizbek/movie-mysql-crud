@@ -9,7 +9,7 @@ import (
 
 var DB *sql.DB
 
-func Connect() {
+func Connect() *sql.DB{
 
 	// cfg := mysql.Config{
 	// 	User:   os.Getenv("root@localhost"),
@@ -25,13 +25,15 @@ func Connect() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer DB.Close()
 	// pingErr := db.Ping()
 	// if pingErr != nil {
 	// 	log.Fatal(pingErr)
 	// }
-	
-}
-func GetDB() *sql.DB{
+	//defer DB.Close()
 	return DB
 }
+
+// func GetDB() *sql.DB{
+// 	//fmt.Println(DB, "db <-------->")
+// 	return DB
+// }
