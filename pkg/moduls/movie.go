@@ -121,3 +121,14 @@ func (m *Movie) Create() *Movie {
 
 	return m
 }
+
+func Delete(id int) *Movie{
+	movie := GetMovie(id)
+	row, err := db.Query("DELETE FROM movie WHERE movieId = ?", id)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	defer row.Close()
+	return movie
+}

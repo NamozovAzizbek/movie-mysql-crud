@@ -45,3 +45,18 @@ func CreateMovie(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
+
+func DeleteMovie(w http.ResponseWriter, r *http.Request){
+	req := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(req)
+	if err != nil {
+		fmt.Println("errror while parsing")
+		return
+	}
+	movie := moduls.Delete(id)
+
+	res, _ := json.Marshal(movie)
+	w.Header().Set("Content-Type", "pkglication/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
