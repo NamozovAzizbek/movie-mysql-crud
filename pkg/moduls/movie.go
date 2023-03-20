@@ -132,3 +132,9 @@ func Delete(id int) *Movie{
 	defer row.Close()
 	return movie
 }
+
+func (m *Movie)Update(id int) *Movie{
+	_ = Delete(id)
+	m.Create()
+	return m
+}
