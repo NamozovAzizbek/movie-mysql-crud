@@ -2,23 +2,23 @@ package moduls
 
 import (
 	"log"
-	"math/rand"
+	"os"
 
 	"github.com/NamozovAzizbek/movie-mysql-crud/pkg/config"
 )
 
 type Director struct {
-	id        int    `json:"id"`
+	//id        int    `json:"id"`
 	Firstname string `json:"firstname"`
 	Lastname  string `json:"lastname"`
-	movie_id  int
 }
 
 type Movie struct {
-	ID       int    `json:"id"`
-	Isbn     string `json:"isbn"`
-	Title    string `json:"title"`
-	Director *Director
+	ID         int    `json:"id"`
+	Isbn       string `json:"isbn"`
+	Title      string `json:"title"`
+	DirectorId int
+	Director   *Director
 }
 
 // func init() {
@@ -31,7 +31,7 @@ func GetMovies() []Movie {
 	movies := make([]Movie, 0)
 	var m Movie
 	var d Director
-	row, err := db.Query("SELECT m.id, m.title, m.isbn, d.firstname, d.lastname FROM movie m INNER JOIN director d on m.id = d.movie_id")
+	row, err := db.Query("SELECT m.movieId, m.title, m.isbn, m.directorId, d.firstname, d.lastname FROM movie m INNER JOIN director d on m.directorId = d.id")
 
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +41,7 @@ func GetMovies() []Movie {
 	defer row.Close()
 
 	for row.Next() {
-		err := row.Scan(&m.ID, &m.Title, &m.Isbn, &d.Firstname, &d.Lastname)
+		err := row.Scan(&m.ID, &m.Title, &m.Isbn, &m.DirectorId ,&d.Firstname, &d.Lastname)
 
 		if err != nil {
 			log.Fatal(err)
@@ -54,7 +54,7 @@ func GetMovies() []Movie {
 }
 
 func GetMovie(id int) *Movie {
-	res, err := db.Query("SELECT m.id, m.title, m.isbn, d.id, d.firstname, d.lastname FROM movie m INNER JOIN director d on m.id = d.movie_id where m.id = ?", id)
+	res, err := db.Query("SELECT m.movieId, m.title, m.isbn, m.directorId ,d.firstname, d.lastname FROM movie m INNER JOIN director d on m.directorId = d.id where m.movieId = ?", id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func GetMovie(id int) *Movie {
 		d Director
 	)
 	for res.Next() {
-		err := res.Scan(&m.ID, &m.Isbn, &m.Title, &d.id, &d.Firstname, &d.Lastname)
+		err := res.Scan(&m.ID, &m.Title, &m.Isbn, &m.DirectorId, &d.Firstname, &d.Lastname)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -74,19 +74,50 @@ func GetMovie(id int) *Movie {
 }
 
 func (m *Movie) Create() *Movie {
-	m.ID = rand.Intn(1000000)
-	res, err := db.Query("INSERT INTO `movie` (`created_at`, `id`, `isbn`, `title`) VALUES (NOW(), ?, ?, ?)", m.ID, m.Isbn, m.Title)
+	//director bor yoki yo'qligini tekshirish uchun
+	row, err := db.Query("SELECT id FROM director WHERE lastname = ? and firstname = ?", m.Director.Lastname, m.Director.Firstname)
+	var id int
+	for row.Next() {
+		err = row.Scan(&id)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}
+	if id == 0 {//agar director mavjud bo'lmasa uni yaratamiz
+		row, err := db.Query("INSERT INTO `director`(`firstname`, `lastname`) VALUES(?,?)", m.Director.Firstname, m.Director.Lastname)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+		defer row.Close()
+	}
+	// director id ni olamiz
+	row, err = db.Query("SELECT id FROM director WHERE lastname = ? and firstname = ?", m.Director.Lastname, m.Director.Firstname)
+	//var id int
+	for row.Next() {
+		err = row.Scan(&id)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}
+	m.DirectorId = id
+	res, err := db.Query("INSERT INTO `movie` (`created_at`, `isbn`, `title`, `directorId`) VALUES (NOW(), ?, ?, ?)", m.Isbn, m.Title, id)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer res.Close()
-	var d Director
-	d.movie_id = m.ID
-	d.id = rand.Intn(1000000)
-	res, err = db.Query("ISERT INTO `director`(`id`, `firstname`, `lastname`, `movie_id`) VALUES(?,?,?,?)", d.id, d.Firstname, d.Lastname, d.movie_id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Close()
+	// var d Director
+	// d.movie_id = m.ID
+	// d.id = rand.Intn(1000000)
+	// res, err = db.Query("INSERT INTO `director`(`id`, `firstname`, `lastname`, `movie_id`) VALUES(?,?,?,?)", d.id, d.Firstname, d.Lastname, d.movie_id)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer res.Close()
+
+	//row, err := db.Query("INSERT INTO `director`(`id`, `firstname`, `lastname`, `movie_id`) VALUES(?,?,?,?)", m.Director.id, m.Director.Firstname, m.Director.Lastname, m.Director.movie_id)
+
 	return m
 }
