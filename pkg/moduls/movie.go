@@ -21,10 +21,6 @@ type Movie struct {
 	Director   *Director
 }
 
-// func init() {
-// 	config.Connect()
-// }
-
 var db = config.Connect()
 
 func GetMovies() []Movie {
