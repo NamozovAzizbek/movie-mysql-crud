@@ -41,7 +41,7 @@ func GetMovies() []Movie {
 	defer row.Close()
 
 	for row.Next() {
-		err := row.Scan(&m.ID, &m.Title, &m.Isbn, &m.DirectorId ,&d.Firstname, &d.Lastname)
+		err := row.Scan(&m.ID, &m.Title, &m.Isbn, &m.DirectorId, &d.Firstname, &d.Lastname)
 
 		if err != nil {
 			log.Fatal(err)
@@ -84,7 +84,8 @@ func (m *Movie) Create() *Movie {
 			os.Exit(1)
 		}
 	}
-	if id == 0 {//agar director mavjud bo'lmasa uni yaratamiz
+	defer row.Close()
+	if id == 0 { //agar director mavjud bo'lmasa uni yaratamiz
 		row, err := db.Query("INSERT INTO `director`(`firstname`, `lastname`) VALUES(?,?)", m.Director.Firstname, m.Director.Lastname)
 		if err != nil {
 			log.Fatal(err)
@@ -94,7 +95,6 @@ func (m *Movie) Create() *Movie {
 	}
 	// director id ni olamiz
 	row, err = db.Query("SELECT id FROM director WHERE lastname = ? and firstname = ?", m.Director.Lastname, m.Director.Firstname)
-	//var id int
 	for row.Next() {
 		err = row.Scan(&id)
 		if err != nil {
@@ -108,21 +108,10 @@ func (m *Movie) Create() *Movie {
 		log.Fatal(err)
 	}
 	defer res.Close()
-	// var d Director
-	// d.movie_id = m.ID
-	// d.id = rand.Intn(1000000)
-	// res, err = db.Query("INSERT INTO `director`(`id`, `firstname`, `lastname`, `movie_id`) VALUES(?,?,?,?)", d.id, d.Firstname, d.Lastname, d.movie_id)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer res.Close()
-
-	//row, err := db.Query("INSERT INTO `director`(`id`, `firstname`, `lastname`, `movie_id`) VALUES(?,?,?,?)", m.Director.id, m.Director.Firstname, m.Director.Lastname, m.Director.movie_id)
-
 	return m
 }
 
-func Delete(id int) *Movie{
+func Delete(id int) *Movie {
 	movie := GetMovie(id)
 	row, err := db.Query("DELETE FROM movie WHERE movieId = ?", id)
 	if err != nil {
@@ -133,8 +122,45 @@ func Delete(id int) *Movie{
 	return movie
 }
 
-func (m *Movie)Update(id int) *Movie{
-	_ = Delete(id)
-	m.Create()
+func (m *Movie) Update(id int) *Movie {
+	// get directorId
+	directoId := 0
+	row, err := db.Query("SELECT id FROM director WHERE lastname = ? and firstname = ?", m.Director.Lastname, m.Director.Firstname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for row.Next() {
+		err = row.Scan(&directoId)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}
+	defer row.Close()
+	if directoId == 0 {
+		//agar director mavjud bo'lmasa uni yaratamiz
+		row, err := db.Query("INSERT INTO `director`(`firstname`, `lastname`) VALUES(?,?)", m.Director.Firstname, m.Director.Lastname)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+		defer row.Close()
+	}
+	// director id ni olamiz
+	row, err = db.Query("SELECT id FROM director WHERE lastname = ? and firstname = ?", m.Director.Lastname, m.Director.Firstname)
+	for row.Next() {
+		err = row.Scan(&directoId)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}
+
+	// yangilash update
+	row, err = db.Query("UPDATE movie SET title = ?, isbn = ?, directorId = ? where movieId = ?", m.Title, m.Isbn, directoId, id)
+	if err != nil {
+		return nil
+	}
+	defer row.Close()
 	return m
 }
